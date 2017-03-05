@@ -13,9 +13,9 @@ deploy:
   api_key:
     secure: ip/Bc7uNA3zYJ8drrAmbGg9NzEApPof5DWVrsuNxvrnwHtIk7y34LpM3uhOPHDaomXMA9p3LIM+WsUFVg2zjFLIjr00NmuFKL7yR0dJtxpl6SYqeHgmNbo8ufBqt/WOU18LB3T7D3kFxzjXT6Zr7WACXHKTIrPh+e6/WD5JIoqpVD099G9a1yQGqLQBRQkKpt20IvTL5HxlRFur3dxd827brzSRALqXeqHE2vU2sZq8ZyylRSrzof/uDDmkXijFD/bGMk9kDBdj/WZ23O6AbF3RX7k14GgMS3aejUQbOnLx671hgUSX2p1sjulbQy8lv7y8WFJcjq0ehOPVJ3dHKMM03PgzNSzu0+/gPSbPsN4qRfsptEWQP0jQgmqB6nXsjVJeubmm+NNIPJW/84EERSSfq0ZI8F1HhCLE85cM7SF8+UKCyxutfkt8PO+uMBSIWsVbMuK5AyPdv5psgc3Oy/buaV26M7GFl0zw/iCBDs+gRBSLdrCIRkJCxiG0ij+oYWN+SHyayrab/xoxIbX1A9EVpxEucE2et671g5TwTdfxPAKc4eR6spdm+g9mDI6RQFQjUD3e2SahW2lupU7zx39fCG4hfGQ+lqVMuWUufyKPcTh2mPX0yi6tK4gDzUmfbbIq/7OXumJ2SzmpmOCbp7SS9ZoUOAHS/WfUGSyAAKH0=
   file: 
-  - homie-intercom
-  - homie-intercom.md5
-  - homie-intercom.sha512
+  - homie-sensor
+  - homie-sensor.md5
+  - homie-sensor.sha512
   on:
     repo: jbonachera/homie-sensor
     tags: true
