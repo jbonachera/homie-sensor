@@ -40,13 +40,13 @@ void temperatureLoopHander(){
     if (isnan(temperature) || isnan(humidity)) {
       Homie.getLogger() << "Failed to read from DHT sensor!"<< endl;;
     } else {
-      Homie.getLogger() << "Temperature: " << temperature << " °C" << endl;
+      Homie.getLogger() << "Temperature: " << temperature << " °C - ";
       temperatureNode.setProperty("degrees").send(String(temperature));
 
-      Homie.getLogger() << "Humidity: " << humidity << " %" << endl;
+      Homie.getLogger() << "Humidity: " << humidity << " % - ";
       humidityNode.setProperty("percent").send(String(humidity));
 
-      Homie.getLogger() << "heatIndex: " << dht.computeHeatIndex(temperature, humidity, false) << " %" << endl;
+      Homie.getLogger() << "heatIndex: " << dht.computeHeatIndex(temperature, humidity, false) << " °C" << endl;
       heatIndexNode.setProperty("degrees").send(String(dht.computeHeatIndex(temperature, humidity, false)));
 
     }
