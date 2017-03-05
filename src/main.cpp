@@ -2,13 +2,14 @@
 #include <DHT.h>
 
 
-#define PINHIGH 13
-#define DHTPIN 12
+#define PINLOW 4
+#define DHTPIN 2
 #define DHTTYPE DHT22
 
-const int TEMPERATURE_INTERVAL = 10;
+const int TEMPERATURE_INTERVAL = 30;
 
 unsigned long lastTemperatureSent = 0;
+unsigned long dht_start_time = 0;
 
 HomieSetting<const char*> roomSetting("room", "The room this sensor will monitor");  // id, description
 
@@ -20,8 +21,8 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setupHandler() {
   dht.begin();
-  pinMode(PINHIGH, OUTPUT);
-  digitalWrite(PINHIGH, HIGH);
+  pinMode(PINLOW, OUTPUT);
+  digitalWrite(PINLOW, LOW);
   temperatureNode.setProperty("unit").send("c");
   temperatureNode.setProperty("room").send(roomSetting.get());
   heatIndexNode.setProperty("unit").send("c");
@@ -32,22 +33,32 @@ void setupHandler() {
 }
 
 void temperatureLoopHander(){
+  bool is_dht_on = digitalRead(PINLOW) == LOW;
   if (millis() - lastTemperatureSent >= TEMPERATURE_INTERVAL * 1000UL || lastTemperatureSent == 0) {
-    float temperature = dht.readTemperature();
-    float humidity = dht.readHumidity();
+    if (!is_dht_on) {
+      Homie.getLogger() << "Powering ON DHT sensor" << endl;
+      digitalWrite(PINLOW, LOW);
+      dht.begin();
+      dht_start_time = millis();
+    } else if (millis() - dht_start_time > 2 * 1000UL) {
+      float temperature = dht.readTemperature();
+      float humidity = dht.readHumidity();
 
-    lastTemperatureSent = millis();
-    if (isnan(temperature) || isnan(humidity)) {
-      Homie.getLogger() << "Failed to read from DHT sensor!"<< endl;;
-    } else {
-      Homie.getLogger() << "Temperature: " << temperature << " °C - ";
-      temperatureNode.setProperty("degrees").send(String(temperature));
+      lastTemperatureSent = millis();
+      if (isnan(temperature) || isnan(humidity)) {
+        Homie.getLogger() << "Failed to read from DHT sensor!"<< endl;;
+      } else {
+        Homie.getLogger() << "Temperature: " << temperature << " °C - ";
+        temperatureNode.setProperty("degrees").send(String(temperature));
 
-      Homie.getLogger() << "Humidity: " << humidity << " % - ";
-      humidityNode.setProperty("percent").send(String(humidity));
+        Homie.getLogger() << "Humidity: " << humidity << " % - ";
+        humidityNode.setProperty("percent").send(String(humidity));
 
-      Homie.getLogger() << "heatIndex: " << dht.computeHeatIndex(temperature, humidity, false) << " °C" << endl;
-      heatIndexNode.setProperty("degrees").send(String(dht.computeHeatIndex(temperature, humidity, false)));
+        Homie.getLogger() << "heatIndex: " << dht.computeHeatIndex(temperature, humidity, false) << " °C" << endl;
+        heatIndexNode.setProperty("degrees").send(String(dht.computeHeatIndex(temperature, humidity, false)));
+      }
+      Homie.getLogger() << "Powering OFF DHT sensor" << endl;
+      digitalWrite(PINLOW, HIGH);
 
     }
   }
@@ -78,11 +89,14 @@ void setup() {
     return true;
   });
 
-
+  Homie.disableLedFeedback();
   Homie.setup();
 }
 
 void loop() {
   Homie.loop();
+
+  // Used to limit self-heating.. we will see if it's efficient.
+  delay(500);
 }
 #endif
