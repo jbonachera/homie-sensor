@@ -2,12 +2,14 @@
 #include <DHT.h>
 
 
-#define DHTPIN 13
+#define PINHIGH 13
+#define DHTPIN 12
 #define DHTTYPE DHT22
 
 const int TEMPERATURE_INTERVAL = 25;
 
 unsigned long lastTemperatureSent = 0;
+unsigned long dht_start_time = 0;
 
 HomieSetting<const char*> roomSetting("room", "The room this sensor will monitor");  // id, description
 
@@ -19,6 +21,8 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setupHandler() {
   dht.begin();
+  pinMode(PINHIGH, OUTPUT);
+  digitalWrite(PINHIGH, LOW);
   temperatureNode.setProperty("unit").send("c");
   temperatureNode.setProperty("room").send(roomSetting.get());
   heatIndexNode.setProperty("unit").send("c");
@@ -29,7 +33,14 @@ void setupHandler() {
 }
 
 void temperatureLoopHander(){
+  bool is_dht_on = digitalRead(PINHIGH) == HIGH;
   if (millis() - lastTemperatureSent >= TEMPERATURE_INTERVAL * 1000UL || lastTemperatureSent == 0) {
+    if (!is_dht_on) {
+      Homie.getLogger() << "Powering ON DHT sensor" << endl;
+      digitalWrite(PINHIGH, HIGH);
+      dht.begin();
+      dht_start_time = millis();
+    } else if (millis() - dht_start_time > 5 * 1000UL) {
       float temperature = dht.readTemperature();
       float humidity = dht.readHumidity();
 
@@ -47,6 +58,9 @@ void temperatureLoopHander(){
         heatIndexNode.setProperty("degrees").send(String(dht.computeHeatIndex(temperature, humidity, false)));
       }
       Homie.getLogger() << "Powering OFF DHT sensor" << endl;
+      digitalWrite(PINHIGH, LOW);
+
+    }
   }
 }
 
@@ -58,7 +72,7 @@ void loopHandler() {
 void setup() {
   Serial.begin(115200);
   Serial << endl << endl;
-  Homie_setFirmware("temperature-sensor", "1.0.7");
+  Homie_setFirmware("temperature-sensor", "1.0.5");
   Homie_setBrand("vx-labs");
   temperatureNode.advertise("unit");
   temperatureNode.advertise("room");
@@ -75,7 +89,6 @@ void setup() {
     return true;
   });
 
-  Homie.disableLedFeedback();
   Homie.setup();
 }
 
@@ -83,6 +96,6 @@ void loop() {
   Homie.loop();
 
   // Used to limit self-heating.. we will see if it's efficient.
-  delay(200);
+  delay(500);
 }
 #endif
