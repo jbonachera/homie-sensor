@@ -58,7 +58,7 @@ void loopHandler() {
 void setup() {
   Serial.begin(115200);
   Serial << endl << endl;
-  Homie_setFirmware("temperature-sensor", "1.0.6");
+  Homie_setFirmware("temperature-sensor", "1.0.7");
   Homie_setBrand("vx-labs");
   temperatureNode.advertise("unit");
   temperatureNode.advertise("room");
