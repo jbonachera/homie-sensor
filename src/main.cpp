@@ -2,14 +2,12 @@
 #include <DHT.h>
 
 
-#define PINLOW 4
-#define DHTPIN 2
+#define DHTPIN 13
 #define DHTTYPE DHT22
 
-const int TEMPERATURE_INTERVAL = 30;
+const int TEMPERATURE_INTERVAL = 25;
 
 unsigned long lastTemperatureSent = 0;
-unsigned long dht_start_time = 0;
 
 HomieSetting<const char*> roomSetting("room", "The room this sensor will monitor");  // id, description
 
@@ -21,8 +19,6 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setupHandler() {
   dht.begin();
-  pinMode(PINLOW, OUTPUT);
-  digitalWrite(PINLOW, LOW);
   temperatureNode.setProperty("unit").send("c");
   temperatureNode.setProperty("room").send(roomSetting.get());
   heatIndexNode.setProperty("unit").send("c");
@@ -33,14 +29,7 @@ void setupHandler() {
 }
 
 void temperatureLoopHander(){
-  bool is_dht_on = digitalRead(PINLOW) == LOW;
   if (millis() - lastTemperatureSent >= TEMPERATURE_INTERVAL * 1000UL || lastTemperatureSent == 0) {
-    if (!is_dht_on) {
-      Homie.getLogger() << "Powering ON DHT sensor" << endl;
-      digitalWrite(PINLOW, LOW);
-      dht.begin();
-      dht_start_time = millis();
-    } else if (millis() - dht_start_time > 2 * 1000UL) {
       float temperature = dht.readTemperature();
       float humidity = dht.readHumidity();
 
@@ -58,9 +47,6 @@ void temperatureLoopHander(){
         heatIndexNode.setProperty("degrees").send(String(dht.computeHeatIndex(temperature, humidity, false)));
       }
       Homie.getLogger() << "Powering OFF DHT sensor" << endl;
-      digitalWrite(PINLOW, HIGH);
-
-    }
   }
 }
 
