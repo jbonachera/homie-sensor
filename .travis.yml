@@ -1,0 +1,9 @@
+sudo: required
+language: go
+services:
+- docker
+script:
+- docker build -t homie-sensor:build-$TRAVIS_COMMIT -f Dockerfile.build . ;
+- docker run homie-sensor:build-$TRAVIS_COMMIT /usr/local/bin/get-artifact > homie-sensor;
+- md5sum homie-sensor > homie-sensor.md5
+- sha512sum homie-sensor > homie-sensor.sha512

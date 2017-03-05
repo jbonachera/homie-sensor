@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cat .pioenvs/nodemcuv2/firmware.bin

@@ -1,0 +1,9 @@
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
+*.gz
+config.json
+homie-intercom
+homie-intercom.md5
+homie-intercom.sha512
