@@ -73,7 +73,7 @@ void loopHandler() {
 void setup() {
   Serial.begin(115200);
   Serial << endl << endl;
-  Homie_setFirmware("intercom", VERSION);
+  Homie_setFirmware("temperature-sensor", VERSION);
   Homie_setBrand("vx-labs")
   temperatureNode.advertise("unit");
   temperatureNode.advertise("room");

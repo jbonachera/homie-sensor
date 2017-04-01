@@ -3,5 +3,5 @@ RUN pacman -S --noconfirm python2 python2-pip git && \
     pip2 install -U platformio
 WORKDIR /usr/local/src
 VOLUME /usr/local/src
-CMD platformio run && mv .pioenvs/nodemcuv2/firmware.bin release/homie-intercom
+CMD platformio run && mv .pioenvs/nodemcuv2/firmware.bin release/homie-sensor
 
