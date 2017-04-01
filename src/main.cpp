@@ -94,8 +94,5 @@ void setup() {
 
 void loop() {
   Homie.loop();
-
-  // Used to limit self-heating.. we will see if it's efficient.
-  delay(500);
 }
 #endif
