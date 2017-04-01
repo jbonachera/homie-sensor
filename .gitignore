@@ -7,3 +7,6 @@ config.json
 homie-intercom
 homie-intercom.md5
 homie-intercom.sha512
+src/version.h
+.pio_home/
+release/

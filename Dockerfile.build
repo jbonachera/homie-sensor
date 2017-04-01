@@ -1,7 +1,7 @@
 FROM jbonachera/arch
 RUN pacman -S --noconfirm python2 python2-pip git && \
     pip2 install -U platformio
-COPY . /usr/local/src
 WORKDIR /usr/local/src
-RUN mv scripts/get-artifact /usr/local/bin
-RUN platformio run
+VOLUME /usr/local/src
+CMD platformio run && mv .pioenvs/nodemcuv2/firmware.bin release/homie-intercom
+
